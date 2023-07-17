@@ -1,4 +1,5 @@
 <?php
+        
 
 class UserManager extends AbstractManager {
 
@@ -9,9 +10,9 @@ class UserManager extends AbstractManager {
       $usersTab = [];
 		foreach($users as $user) {
          $userInstance = new User(
-            $user['username'],
-            $user['email'],
-            $user['password']
+            $user['first_name'],
+            $user['last_name'],
+            $user['email']
          );
          $userInstance->setId($user['id']);
 			array_push($usersTab,$user);
@@ -26,9 +27,9 @@ class UserManager extends AbstractManager {
 		$query->execute($parameters);
 		$user = $query->fetch(PDO::FETCH_ASSOC);
 		$userInstance = new User(
-         $user['username'],
-         $user['email'],
-         $user['password']
+         $user['first_name'],
+         $user['last_name'],
+         $user['email']
       );
       $userInstance->setId($user['id']);
       return $userInstance;
@@ -41,46 +42,43 @@ class UserManager extends AbstractManager {
 		$query->execute($parameters);
 		$user = $query->fetch(PDO::FETCH_ASSOC);
 		$userInstance = new User(
-         $user['username'],
-         $user['email'],
-         $user['password']
+         $user['first_name'],
+         $user['last_name'],
+         $user['email']
       );
       $userInstance->setId($user['id']);
       return $userInstance;
 	}
    public function insertUser(User $user) : User {
       $query = $this->db->prepare('
-			INSERT INTO users (email, username, password)
-			VALUES (:email, :username, :password)
+			INSERT INTO users (first_name, last_name, email)
+			VALUES (:firstname, :lastname, :email)
 		');
 		$parameters = [
-			'email' => $user->getEmail(),
-			'username' => $user->getUsername(),
-			'password' => password_hash($user->getPassword(),PASSWORD_DEFAULT)
+			'firstname' => $user->getFirstName(),
+			'lastname' => $user->getLastName(),
+			'email' => $user->getEmail()
 		];
 		$query->execute($parameters);
 
       $user = $this->getUserByEmail($user->getEmail());
       return $user;
    }
-   public function editUser(User $user) : User {
+   public function editUser(User $user) {
 		$query = $this->db->prepare('
 			UPDATE users
-			SET email = :email,
-			username = :username,
-			password = :password
+			SET first_name = :firstname,
+			last_name = :lastname,
+			email = :email
 			WHERE id = :id
 		');
 		$parameters = [
+			'firstname' => $user->getFirstName(),
+			'lastname' => $user->getLastName(),
 			'email' => $user->getEmail(),
-			'username' => $user->getUsername(),
-			'password' => $user->getPassword(),
 			'id' => $user->getId()
 		];
 		$query->execute($parameters);
-
-		$user = $this->getUserById($user->getId());
-		return $user;
 	}
    public function deleteUser(User $user) : void {
       $query = $this->db->prepare('

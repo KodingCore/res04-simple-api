@@ -1,49 +1,68 @@
 <?php
 
-class UserController
+class UserController extends AbstractController
 {
-    public function login()
+    public function readAll()
     {
-        if (isset($_POST["email"], $_POST["password"])) {
-            $user = $this->userManager->getUserByEmail($_POST["email"]);
-            if (password_verify($_POST["password"], $user->getPassword())) {
-                $_SESSION['user_id'] = $user->getId();
-                header("Location: /index.php?route=categories");
-                exit();
-            } else {
-                $allUsers = $this->userManager->getAllUsers();
-                $this->render('user/login.phtml', ["users" => $allUsers]);
+        $userManager = new UserManager();
+        $this->render('views/user/edit.phtml', ["users" => $userManager->getAllUsers()]);
+    }
+    
+    public function read()
+    {
+        $userManager = new UserManager();
+        if (isset($_POST["firstname"], $_POST["lastname"], $_POST['email'])) {
+            $user = $userManager->getUserByEmail($_POST["email"]);
+            if($user){
+                $_SESSION["userId"] = $user->getId();
+                $this->render('views/user/edit.phtml', []);
             }
         } else {
-            $allUsers = $this->userManager->getAllUsers();
-            $this->render('user/login.phtml', ["users" => $allUsers]);
+            $this->render('views/user/login.phtml', []);
         }
     }
 
-    public function register()
+    public function create()
     {
-        if (isset($_POST['email'], $_POST['username'], $_POST['password'], $_POST['confirm-password'])) {
-            if ($_POST['password'] === $_POST['confirm-password']) {
-                $pwd = $_POST['password'];
-                $email = $_POST['email'];
-                $username = $_POST['username'];
-                $user = new User($username, $email, $pwd);
-                $this->userManager->insertUser($user);
-                $allUsers = $this->userManager->getAllUsers();
-                $this->render('user/login.phtml', ["users" => $allUsers]);
-            } else {
-                $this->render('user/register.phtml', []);
-            }
+        $userManager = new UserManager();
+        
+        if (isset($_POST['firstname'], $_POST['lastname'], $_POST['email']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty( $_POST['email'])) {
+            
+            $user = new User($_POST['firstname'], $_POST['lastname'], $_POST['email']);
+            $userManager->insertUser($user);
+            $this->render('views/user/login.phtml', []);
         } else {
-            $this->render('user/register.phtml', []);
+            $this->render('views/user/register.phtml', []);
         }
     }
-    public function logout(): void
+    
+    public function edit()
     {
-        if (isset($_SESSION['user_id'])) {
-            unset($_SESSION['user_id']);
-            header("Location: /index.php?route=user-login");
-            exit();
+        $userManager = new UserManager();
+        $this->readAll();
+        if (isset($_POST['firstname'], $_POST['lastname'], $_POST['email'])) {
+            $user = new User($_POST['firstname'], $_POST['lastname'], $_POST['email']);
+            $user->setId($_SESSION["userId"]);
+            $userManager->editUser($user);
+            
+            $this->render('views/user/login.phtml', []);
+        } else {
+            $this->render('views/user/edit.phtml', $data["users"]);
         }
+    }
+    
+    public function deleteU()
+    {
+        if(isset($_SESSION["userId"]))
+        {
+            $userManager = new UserManager();
+            $user = $userManager->getUserById($_SESSION["userId"]);
+            $userManager->deleteUser($user);
+            session_destroy();
+            $this->render('views/user/login.phtml', []);
+        }else{
+            $this->render('views/user/edit.phtml', $data["users"]);
+        }
+        
     }
 }

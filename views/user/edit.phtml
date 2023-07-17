@@ -1,5 +1,5 @@
-<h2>Edit User</h2>
-<form methode="GET" action="index.php?route=edit-user">
+<h2>My account</h2>
+<form method="POST" action="index.php?route=edit-user">
     <label for="firstname">Firstname</label>
     <input type="text" name="firstname"/>
     <label for="lastname">Lastname</label>
@@ -8,3 +8,34 @@
     <input type="email" name="email"/>
     <input type="submit" value="Submit"/>
 </form>
+
+<form action="index.php?route=delete-user" method="POST">
+    <input type="submit" value="Delete account"/>
+</form>
+
+<table>
+    <thead>
+        <th>
+            <td>First Name</td>
+            <td>Last Name</td>
+            <td>Email</td>
+        </th>
+    </thead>
+    <tbody>
+        <tr>
+            <?php
+            
+            if(isset($data["users"])){
+                foreach($data["users"] as $user)
+                {
+                    ?><td><?=$user->getFirstName()?></td>
+                    <td><?=$user->getLastName()?></td>
+                    <td><?=$user->getEmail()?></td><?php
+                }
+            }
+            
+            ?>
+        </tr>
+    </tbody>
+    
+</table>

@@ -6,7 +6,7 @@ class User {
     private string $firstName;
     private string $lastName;
     
-    public function __construct(string $firstName, string $email, string $lastName){
+    public function __construct(string $firstName, string $lastName, string $email){
         $this->id = null;
         $this->firstName = $firstName;
         $this->email = $email;
@@ -29,7 +29,7 @@ class User {
         return $this->lastName;
     }
     
-    public function setId(string $id) : void
+    public function setId(int $id) : void
     {
         $this->id = $id;
     }
@@ -37,7 +37,7 @@ class User {
     {
         $this->firstName = $firstName;
     }
-    public function setEmail($email) : void
+    public function setEmail(string $email) : void
     {
         $this->email = $email;
     }
